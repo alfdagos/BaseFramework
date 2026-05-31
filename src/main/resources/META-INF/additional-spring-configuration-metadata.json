@@ -1,0 +1,40 @@
+{
+  "properties": [
+    {
+      "name": "baseframework.security.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether the framework's default HTTP Basic security filter chain is enabled. When false, all requests are permitted (intended for local development or gateway-handled security).",
+      "defaultValue": true
+    },
+    {
+      "name": "baseframework.kafka.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Opt-in flag that activates the framework's Kafka consumer/producer factories and KafkaTemplate.",
+      "defaultValue": false
+    },
+    {
+      "name": "baseframework.jpa.auditing.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether Spring Data JPA auditing (createdAt/updatedAt population) is enabled.",
+      "defaultValue": true
+    },
+    {
+      "name": "baseframework.openapi.title",
+      "type": "java.lang.String",
+      "description": "Title shown in the generated OpenAPI document and Swagger UI.",
+      "defaultValue": "Microservice API"
+    },
+    {
+      "name": "baseframework.openapi.description",
+      "type": "java.lang.String",
+      "description": "Description shown in the generated OpenAPI document.",
+      "defaultValue": "REST API powered by BaseFramework"
+    },
+    {
+      "name": "baseframework.openapi.version",
+      "type": "java.lang.String",
+      "description": "Version label shown in the generated OpenAPI document.",
+      "defaultValue": "v1"
+    }
+  ]
+}

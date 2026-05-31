@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -16,6 +17,12 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
+/**
+ * Opt-in Kafka configuration providing String/String consumer and producer factories plus a
+ * {@link KafkaTemplate}. Activated by the framework auto-configuration only when
+ * {@code baseframework.kafka.enabled=true}, so it never clashes with Spring Boot's own Kafka
+ * auto-configuration. Every bean is conditional on being missing, so consumers can override.
+ */
 @Configuration
 public class KafkaConfig {
 
@@ -25,7 +32,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.group-id:baseframework-group}")
     private String groupId;
 
+    @Value("${spring.kafka.producer.acks:all}")
+    private String producerAcks;
+
     @Bean
+    @ConditionalOnMissingBean
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -35,10 +46,8 @@ public class KafkaConfig {
         return new DefaultKafkaConsumerFactory<>(config);
     }
 
-    @Value("${spring.kafka.producer.acks:all}")
-    private String producerAcks;
-
     @Bean
+    @ConditionalOnMissingBean
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -49,7 +58,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    @ConditionalOnMissingBean
+    public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
     }
 }

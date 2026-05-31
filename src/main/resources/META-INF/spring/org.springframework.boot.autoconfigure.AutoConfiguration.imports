@@ -1,0 +1,5 @@
+it.alf.baseframework.autoconfigure.BaseFrameworkJpaAuditingAutoConfiguration
+it.alf.baseframework.autoconfigure.BaseFrameworkSecurityAutoConfiguration
+it.alf.baseframework.autoconfigure.BaseFrameworkWebAutoConfiguration
+it.alf.baseframework.autoconfigure.BaseFrameworkOpenApiAutoConfiguration
+it.alf.baseframework.autoconfigure.BaseFrameworkKafkaAutoConfiguration

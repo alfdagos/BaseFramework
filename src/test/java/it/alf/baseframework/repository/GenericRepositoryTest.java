@@ -1,6 +1,5 @@
 package it.alf.baseframework.repository;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,20 +7,21 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import it.alf.baseframework.model.BaseEntity;
+import it.alf.baseframework.testsupport.SampleEntity;
 
-public class GenericRepositoryTest {
+class GenericRepositoryTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     void repositoryMockShouldSaveAndFindEntity() {
-        GenericRepository<BaseEntity> repository = mock(GenericRepository.class);
-        BaseEntity entity = new BaseEntity();
+        GenericRepository<SampleEntity> repository = mock(GenericRepository.class);
+        SampleEntity entity = new SampleEntity("a");
 
         when(repository.save(entity)).thenReturn(entity);
-        when(repository.findAll()).thenReturn(Collections.singletonList(entity));
+        when(repository.findAll()).thenReturn(List.of(entity));
 
-        BaseEntity savedEntity = repository.save(entity);
-        List<BaseEntity> entities = repository.findAll();
+        SampleEntity savedEntity = repository.save(entity);
+        List<SampleEntity> entities = repository.findAll();
 
         assertThat(savedEntity).isNotNull();
         assertThat(entities).contains(savedEntity);

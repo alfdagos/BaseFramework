@@ -149,3 +149,6 @@ docs/build/
 
 # Local configuration override
 config/local.properties
+
+# Claude Code local artifacts
+.claude/

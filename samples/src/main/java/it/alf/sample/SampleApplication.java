@@ -2,24 +2,17 @@ package it.alf.sample;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
 
 /**
- * Sample Spring Boot application that demonstrates how to wire the
- * `baseframework` library into a real microservice.
+ * Sample Spring Boot application demonstrating how to consume the {@code baseframework} library.
  *
- * Notes on integration:
- * - This class is a normal Spring Boot entrypoint; the sample keeps
- *   framework-specific configuration (eg. `SecurityConfig`) explicit by
- *   importing it with `@Import(...)`. This shows one way for a consumer
- *   to reuse configuration from the library while keeping the sample
- *   code and framework code separated.
- * - The sample also demonstrates the recommended pattern of creating
- *   concrete service and controller classes that extend the generic
- *   baseframework types (GenericCrudService / GenericCrudController).
+ * <p>Notice there is no manual {@code @Import} of framework configuration: the library ships
+ * Spring Boot auto-configuration (see
+ * {@code META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports}),
+ * so security, the global exception handler, JPA auditing and OpenAPI are wired automatically.
+ * The sample only provides concrete service/controller subclasses of the generic types.
  */
 @SpringBootApplication
-@Import(it.alf.baseframework.config.SecurityConfig.class)
 public class SampleApplication {
     public static void main(String[] args) {
         SpringApplication.run(SampleApplication.class, args);
