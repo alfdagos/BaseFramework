@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `GenericCrudService.update` now performs an in-place update (JPA `merge`) instead of
+  re-inserting a new row. A PUT payload never carries the optimistic-lock `@Version`, which
+  made Spring Data treat the detached entity as new and `persist` it (creating a duplicate
+  row and discarding the original `createdAt`); the existing `id`, `version` and `createdAt`
+  are now carried over from the persisted entity. Covered by a new persistence-level test.
+- `GenericCrudController.create` now builds the `Location` header from the current request URI
+  (e.g. `/api/my-entities/42`) instead of a bare `/{id}`.
+
 ### Added
 - **Spring Boot auto-configuration**: the library now wires itself through
   `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`.

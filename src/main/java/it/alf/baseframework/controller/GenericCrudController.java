@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import it.alf.baseframework.model.BaseEntity;
@@ -56,7 +57,10 @@ public abstract class GenericCrudController<T extends BaseEntity> {
     @PostMapping
     public ResponseEntity<T> create(@Valid @RequestBody T entity) {
         T created = service.create(entity);
-        URI location = URI.create("/" + created.getId());
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
         return ResponseEntity.created(location).body(created);
     }
 
