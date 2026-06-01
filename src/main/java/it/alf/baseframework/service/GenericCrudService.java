@@ -36,8 +36,14 @@ public abstract class GenericCrudService<T extends BaseEntity> {
 
     @Transactional
     public T update(Long id, T entity) {
-        requireExisting(id);
+        T existing = getById(id);
         entity.setId(id);
+        // Carry over the audit/version state so {@code save()} performs a merge (UPDATE)
+        // instead of a persist (INSERT). With a wrapper @Version column Spring Data treats an
+        // entity whose version is null as new; a PUT payload never carries the version, so
+        // without this the row would be re-inserted and createdAt lost.
+        entity.setVersion(existing.getVersion());
+        entity.setCreatedAt(existing.getCreatedAt());
         return repository.save(entity);
     }
 

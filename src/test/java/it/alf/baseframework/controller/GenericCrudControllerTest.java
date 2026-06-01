@@ -2,9 +2,13 @@ package it.alf.baseframework.controller;
 
 import it.alf.baseframework.service.GenericCrudService;
 import it.alf.baseframework.testsupport.SampleEntity;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 
@@ -12,6 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class GenericCrudControllerTest {
+
+    @AfterEach
+    void clearRequestContext() {
+        RequestContextHolder.resetRequestAttributes();
+    }
 
     private GenericCrudController<SampleEntity> controllerFor(GenericCrudService<SampleEntity> service) {
         return new GenericCrudController<>(service) {
@@ -39,10 +48,14 @@ class GenericCrudControllerTest {
         saved.setId(42L);
         when(service.create(any())).thenReturn(saved);
 
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/samples");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
         ResponseEntity<SampleEntity> response = controllerFor(service).create(new SampleEntity("a"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getHeaders().getLocation()).hasToString("/42");
+        // Location points at the created resource, relative to the collection URI.
+        assertThat(response.getHeaders().getLocation()).hasToString("http://localhost/api/samples/42");
         assertThat(response.getBody()).isEqualTo(saved);
     }
 

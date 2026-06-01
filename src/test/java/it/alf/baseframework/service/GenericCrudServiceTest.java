@@ -6,6 +6,7 @@ import it.alf.baseframework.testsupport.SampleEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +55,7 @@ class GenericCrudServiceTest {
 
     @Test
     void update_shouldThrowWhenEntityDoesNotExist() {
-        when(repository.existsById(5L)).thenReturn(false);
+        when(repository.findById(5L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(5L, new SampleEntity("x")))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -62,15 +63,23 @@ class GenericCrudServiceTest {
     }
 
     @Test
-    void update_shouldSetIdAndSaveWhenEntityExists() {
-        SampleEntity entity = new SampleEntity("x");
-        when(repository.existsById(7L)).thenReturn(true);
-        when(repository.save(entity)).thenReturn(entity);
+    void update_shouldCarryOverIdAuditAndVersionFromExisting() {
+        SampleEntity existing = new SampleEntity("old");
+        existing.setId(7L);
+        existing.setVersion(3L);
+        existing.setCreatedAt(Instant.parse("2020-01-01T00:00:00Z"));
+        when(repository.findById(7L)).thenReturn(Optional.of(existing));
 
-        SampleEntity updated = service.update(7L, entity);
+        SampleEntity incoming = new SampleEntity("new");
+        when(repository.save(incoming)).thenReturn(incoming);
 
+        SampleEntity updated = service.update(7L, incoming);
+
+        // id, version and createdAt are carried over so save() merges (UPDATE) and audit state is kept.
         assertThat(updated.getId()).isEqualTo(7L);
-        verify(repository).save(entity);
+        assertThat(updated.getVersion()).isEqualTo(3L);
+        assertThat(updated.getCreatedAt()).isEqualTo(Instant.parse("2020-01-01T00:00:00Z"));
+        verify(repository).save(incoming);
     }
 
     @Test
